@@ -1,5 +1,8 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {};
+const nextConfig: NextConfig = {
+  output: 'export',
+  basePath: '/Quiz-utlime',
+};
 
 export default nextConfig;
