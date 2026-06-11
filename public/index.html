@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Bac STI2D — Révisions</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+      min-height: 100vh;
+      color: #e2e8f0;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    /* Background effects */
+    .bg-glow {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(100px);
+      pointer-events: none;
+      z-index: -1;
+    }
+    .bg-glow-1 { top: -150px; right: -100px; width: 400px; height: 400px; background: rgba(59, 130, 246, 0.15); }
+    .bg-glow-2 { bottom: -150px; left: -100px; width: 400px; height: 400px; background: rgba(168, 85, 247, 0.15); }
+    .bg-glow-3 { top: 50%; left: 50%; transform: translate(-50%, -50%); width: 500px; height: 500px; background: rgba(34, 197, 94, 0.08); }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(71, 85, 105, 0.5);
+      border-radius: 50px;
+      font-size: 0.875rem;
+      color: #94a3b8;
+      margin-bottom: 1.5rem;
+    }
+
+    .title {
+      font-size: 3rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #60a5fa, #a78bfa, #34d399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 1rem;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+
+    /* Subject Cards */
+    .subjects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .subject-card {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(71, 85, 105, 0.3);
+      border-radius: 1rem;
+      padding: 2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .subject-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(96, 165, 250, 0.5);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .subject-card.blue:hover { border-color: rgba(59, 130, 246, 0.6); }
+    .subject-card.purple:hover { border-color: rgba(168, 85, 247, 0.6); }
+    .subject-card.green:hover { border-color: rgba(34, 197, 94, 0.6); }
+
+    .subject-emoji {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .subject-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .subject-desc {
+      font-size: 0.875rem;
+      color: #64748b;
+      line-height: 1.5;
+    }
+
+    /* Quiz Container */
+    .quiz-container {
+      display: none;
+    }
+
+    .quiz-container.active {
+      display: block;
+    }
+
+    /* Name Input */
+    .name-screen {
+      text-align: center;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(71, 85, 105, 0.3);
+      border-radius: 1.5rem;
+      padding: 3rem 2rem;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .name-screen h2 {
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .name-screen p {
+      color: #64748b;
+      margin-bottom: 2rem;
+    }
+
+    .input-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .input-group label {
+      display: block;
+      text-align: left;
+      font-size: 0.875rem;
+      color: #94a3b8;
+      margin-bottom: 0.5rem;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 1rem;
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(71, 85, 105, 0.5);
+      border-radius: 0.75rem;
+      color: white;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input-group input:focus {
+      border-color: #3b82f6;
+    }
+
+    .input-group input::placeholder {
+      color: #475569;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 0.75rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      color: white;
+      width: 100%;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+      transform: scale(1.02);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(71, 85, 105, 0.5);
+      color: #94a3b8;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(51, 65, 85, 0.8);
+      color: white;
+    }
+
+    /* Quiz Screen */
+    .quiz-screen {
+      display: none;
+    }
+
+    .quiz-screen.active {
+      display: block;
+    }
+
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .quiz-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .quiz-info span {
+      font-size: 0.875rem;
+      color: #64748b;
+    }
+
+    .quiz-score {
+      font-weight: 700;
+      color: #e2e8f0;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: rgba(30, 41, 59, 0.8);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6, #34d399);
+      border-radius: 10px;
+      transition: width 0.5s ease;
+    }
+
+    .question-card {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(71, 85, 105, 0.3);
+      border-radius: 1.5rem;
+      padding: 2rem;
+    }
+
+    .question-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      background: rgba(30, 41, 59, 0.8);
+      border-radius: 0.75rem;
+      font-weight: 700;
+      color: #64748b;
+      margin-bottom: 1rem;
+    }
+
+    .question-text {
+      font-size: 1.25rem;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .option {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(71, 85, 105, 0.4);
+      border-radius: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .option:hover:not(.disabled) {
+      background: rgba(51, 65, 85, 0.6);
+      border-color: rgba(96, 165, 250, 0.5);
+    }
+
+    .option.disabled {
+      cursor: default;
+    }
+
+    .option.correct {
+      background: rgba(34, 197, 94, 0.15);
+      border-color: rgba(34, 197, 94, 0.5);
+    }
+
+    .option.wrong {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.5);
+    }
+
+    .option-letter {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: rgba(51, 65, 85, 0.8);
+      border-radius: 0.5rem;
+      font-weight: 700;
+      font-size: 0.875rem;
+      color: #94a3b8;
+    }
+
+    .option.correct .option-letter {
+      background: rgba(34, 197, 94, 0.3);
+      color: #4ade80;
+    }
+
+    .option.wrong .option-letter {
+      background: rgba(239, 68, 68, 0.3);
+      color: #f87171;
+    }
+
+    .option-text {
+      flex: 1;
+      font-size: 0.95rem;
+    }
+
+    .option-icon {
+      font-size: 1.25rem;
+    }
+
+    /* Results Screen */
+    .results-screen {
+      display: none;
+      text-align: center;
+    }
+
+    .results-screen.active {
+      display: block;
+    }
+
+    .results-card {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(71, 85, 105, 0.3);
+      border-radius: 1.5rem;
+      padding: 3rem 2rem;
+      max-width: 450px;
+      margin: 0 auto;
+    }
+
+    .results-emoji {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+
+    .results-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .results-player {
+      color: #64748b;
+      margin-bottom: 2rem;
+    }
+
+    .score-circle {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .score-circle svg {
+      transform: rotate(-90deg);
+    }
+
+    .score-circle-bg {
+      fill: none;
+      stroke: #1e293b;
+      stroke-width: 10;
+    }
+
+    .score-circle-fill {
+      fill: none;
+      stroke: url(#scoreGradient);
+      stroke-width: 10;
+      stroke-linecap: round;
+      transition: stroke-dasharray 1s ease;
+    }
+
+    .score-value {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .score-number {
+      font-size: 3rem;
+      font-weight: 900;
+    }
+
+    .score-total {
+      font-size: 1rem;
+      color: #64748b;
+    }
+
+    .results-message {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 2rem;
+    }
+
+    .results-message.excellent { color: #fbbf24; }
+    .results-message.good { color: #4ade80; }
+    .results-message.ok { color: #60a5fa; }
+    .results-message.bad { color: #fb923c; }
+    .results-message.fail { color: #f87171; }
+
+    .discord-notice {
+      background: rgba(88, 101, 242, 0.15);
+      border: 1px solid rgba(88, 101, 242, 0.3);
+      border-radius: 0.75rem;
+      padding: 1rem;
+      margin-bottom: 2rem;
+      font-size: 0.875rem;
+      color: #a5b4fc;
+    }
+
+    .discord-notice strong {
+      color: #818cf8;
+    }
+
+    .results-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .back-link {
+      display: block;
+      margin-top: 1.5rem;
+      color: #64748b;
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover {
+      color: #e2e8f0;
+    }
+
+    /* Home Screen */
+    #home-screen {
+      display: block;
+    }
+
+    #home-screen.hidden {
+      display: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .title {
+        font-size: 2rem;
+      }
+
+      .subjects-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .question-text {
+        font-size: 1.1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+  <div class="bg-glow bg-glow-3"></div>
+
+  <div class="container">
+    <!-- Home Screen -->
+    <div id="home-screen">
+      <div class="header">
+        <div class="badge">🎓 Bac STI2D 2026</div>
+        <h1 class="title">Quiz de Révision</h1>
+        <p class="subtitle">20 questions aléatoires par quiz • Des questions différentes à chaque fois • Scores envoyés sur Discord</p>
+      </div>
+
+      <div class="subjects-grid">
+        <div class="subject-card blue" onclick="selectSubject('physique-chimie')">
+          <div class="subject-emoji">⚛️</div>
+          <div class="subject-name">Physique-Chimie</div>
+          <div class="subject-desc">Énergie, thermique, électricité, chimie, ondes, mécanique...</div>
+        </div>
+
+        <div class="subject-card purple" onclick="selectSubject('maths')">
+          <div class="subject-emoji">📐</div>
+          <div class="subject-name">Mathématiques</div>
+          <div class="subject-desc">Dérivation, suites, probabilités, trigonométrie, intégrales...</div>
+        </div>
+
+        <div class="subject-card green" onclick="selectSubject('sin')">
+          <div class="subject-emoji">💻</div>
+          <div class="subject-name">SIN</div>
+          <div class="subject-desc">Numération, réseaux, protocoles, adressage IP, RS232, I²C...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quiz Container -->
+    <div id="quiz-container" class="quiz-container">
+      <!-- Name Screen -->
+      <div id="name-screen" class="name-screen">
+        <div id="subject-icon" class="subject-emoji">⚛️</div>
+        <h2 id="subject-title">Physique-Chimie</h2>
+        <p>20 questions aléatoires</p>
+
+        <div class="input-group">
+          <label for="player-name">Entre ton prénom</label>
+          <input type="text" id="player-name" placeholder="Ton prénom..." autofocus>
+        </div>
+
+        <button class="btn btn-primary" onclick="startQuiz()">🚀 Lancer le Quiz</button>
+
+        <a href="#" class="back-link" onclick="goHome()">← Retour à l'accueil</a>
+      </div>
+
+      <!-- Quiz Screen -->
+      <div id="quiz-screen" class="quiz-screen">
+        <div class="quiz-header">
+          <div class="quiz-info">
+            <span id="current-emoji">⚛️</span>
+            <span id="player-display">Joueur</span>
+          </div>
+          <div class="quiz-info">
+            <span class="quiz-score"><span id="current-score">0</span>/<span id="answered-count">0</span></span>
+            <span>Q<span id="question-num">1</span>/20</span>
+          </div>
+        </div>
+
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill" style="width: 5%"></div>
+        </div>
+
+        <div class="question-card">
+          <div class="question-number" id="question-number">1</div>
+          <div class="question-text" id="question-text">Question...</div>
+
+          <div class="options" id="options-container">
+            <!-- Options will be inserted here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Results Screen -->
+      <div id="results-screen" class="results-screen">
+        <div class="results-card">
+          <div class="results-emoji" id="results-emoji">🏆</div>
+          <h2 class="results-title">Résultats</h2>
+          <p class="results-player"><span id="results-player">Joueur</span> — <span id="results-subject">Matière</span></p>
+
+          <div class="score-circle">
+            <svg width="160" height="160" viewBox="0 0 120 120">
+              <defs>
+                <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#3b82f6" />
+                  <stop offset="50%" stop-color="#a855f7" />
+                  <stop offset="100%" stop-color="#22c55e" />
+                </linearGradient>
+              </defs>
+              <circle class="score-circle-bg" cx="60" cy="60" r="50" />
+              <circle class="score-circle-fill" id="score-circle-fill" cx="60" cy="60" r="50" stroke-dasharray="0 314" />
+            </svg>
+            <div class="score-value">
+              <div class="score-number" id="final-score">0</div>
+              <div class="score-total">/20</div>
+            </div>
+          </div>
+
+          <p class="results-message" id="results-message">Excellent !</p>
+
+          <div class="discord-notice">
+            <strong>📤 Score envoyé sur Discord !</strong><br>
+            Ton score apparaît dans le classement sur le serveur.
+          </div>
+
+          <div class="results-buttons">
+            <button class="btn btn-primary" onclick="restartQuiz()">🔄 Refaire un quiz</button>
+            <button class="btn btn-secondary" onclick="goHome()">🏠 Changer de matière</button>
+          </div>
+
+          <a href="#" class="back-link" onclick="goHome()">← Retour à l'accueil</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============== QUESTIONS DATABASE ==============
+    const questionsDB = {
+      "physique-chimie": [
+        { q: "Quelle est l'unité de mesure de l'énergie dans le système international ?", o: ["Le Watt (W)", "Le Joule (J)", "Le Newton (N)", "Le Pascal (Pa)"], a: 1 },
+        { q: "Quelle est la formule de l'énergie cinétique ?", o: ["Ec = mgh", "Ec = ½mv²", "Ec = Fd", "Ec = mc²"], a: 1 },
+        { q: "Quelle est la formule de l'énergie potentielle de pesanteur ?", o: ["Ep = ½mv²", "Ep = mgh", "Ep = Fd", "Ep = qU"], a: 1 },
+        { q: "Qu'est-ce que la puissance ?", o: ["L'énergie stockée", "L'énergie transférée par unité de temps", "La force exercée", "La vitesse"], a: 1 },
+        { q: "Quelle est la relation entre puissance, énergie et temps ?", o: ["P = E × t", "P = E / t", "P = E + t", "P = E² / t"], a: 1 },
+        { q: "1 kWh correspond à combien de Joules ?", o: ["1 000 J", "100 000 J", "3 600 000 J", "36 000 J"], a: 2 },
+        { q: "Quel est le rendement d'un système énergétique ?", o: ["η = Eperdue / Etotale", "η = Eutile / Eabsorbée", "η = Eabsorbée / Eutile", "η = Etotale / Eperdue"], a: 1 },
+        { q: "Quelle est l'unité de la puissance ?", o: ["Le Joule (J)", "Le Watt (W)", "Le Volt (V)", "L'Ampère (A)"], a: 1 },
+        { q: "Quelle est la formule du flux thermique ?", o: ["Φ = ΔT / Rth", "Φ = Rth × ΔT", "Φ = m × c × ΔT", "Φ = λ × S / e"], a: 0 },
+        { q: "Quelle est l'unité de la résistance thermique ?", o: ["W/K", "K/W", "J/K", "W·m⁻¹·K⁻¹"], a: 1 },
+        { q: "Comment se calcule la résistance thermique d'une paroi ?", o: ["Rth = λ × S / e", "Rth = e / (λ × S)", "Rth = λ × e / S", "Rth = S / (λ × e)"], a: 1 },
+        { q: "Que représente λ (lambda) en thermique ?", o: ["La résistance thermique", "Le flux thermique", "La conductivité thermique", "La capacité thermique"], a: 2 },
+        { q: "Quelle est la formule de l'énergie thermique ?", o: ["Q = m × c × ΔT", "Q = P × t", "Q = ΔT / Rth", "Q = Φ × t"], a: 0 },
+        { q: "Un bon isolant thermique a une conductivité thermique λ :", o: ["Très élevée", "Très faible", "Égale à 1", "Nulle"], a: 1 },
+        { q: "Quels sont les trois modes de transfert thermique ?", o: ["Conduction, convection, rayonnement", "Conduction, diffusion, absorption", "Convection, radiation, émission", "Diffusion, rayonnement, réflexion"], a: 0 },
+        { q: "Quelle est la loi d'Ohm ?", o: ["U = R × I", "U = R / I", "I = U × R", "R = U × I"], a: 0 },
+        { q: "Quelle est la formule de la puissance électrique ?", o: ["P = U / I", "P = U × I", "P = R × I", "P = U × R"], a: 1 },
+        { q: "Quelle est l'unité de l'intensité du courant ?", o: ["Le Volt (V)", "L'Ohm (Ω)", "L'Ampère (A)", "Le Watt (W)"], a: 2 },
+        { q: "Dans un circuit en série, que se passe-t-il avec l'intensité ?", o: ["Elle varie à chaque composant", "Elle est la même partout", "Elle double à chaque résistance", "Elle est nulle"], a: 1 },
+        { q: "Dans un circuit en parallèle, que se passe-t-il avec la tension ?", o: ["Elle est différente à chaque branche", "Elle est nulle", "Elle est la même aux bornes de chaque branche", "Elle double à chaque branche"], a: 2 },
+        { q: "Comment calcule-t-on la résistance équivalente de résistances en série ?", o: ["1/Req = 1/R1 + 1/R2", "Req = R1 × R2 / (R1 + R2)", "Req = R1 + R2 + ...", "Req = R1 - R2"], a: 2 },
+        { q: "Quelle est l'énergie dissipée par effet Joule ?", o: ["E = R × I × t", "E = R × I² × t", "E = U × t", "E = P / t"], a: 1 },
+        { q: "Quelle est la formule de la concentration molaire ?", o: ["C = n / V", "C = m / V", "C = n × V", "C = V / n"], a: 0 },
+        { q: "Quelle est la relation entre n, m et M ?", o: ["n = m × M", "n = m / M", "n = M / m", "n = m + M"], a: 1 },
+        { q: "Quel est le nombre d'Avogadro ?", o: ["6,022 × 10²³ mol⁻¹", "3,14 × 10²³ mol⁻¹", "6,022 × 10⁻²³ mol⁻¹", "9,81 × 10²³ mol⁻¹"], a: 0 },
+        { q: "Qu'est-ce qu'une réaction exothermique ?", o: ["Elle absorbe de la chaleur", "Elle libère de la chaleur", "Sans échange de chaleur", "Une réaction nucléaire"], a: 1 },
+        { q: "Qu'est-ce qu'un pH neutre ?", o: ["pH = 0", "pH = 7", "pH = 14", "pH = 1"], a: 1 },
+        { q: "Un pH inférieur à 7 indique une solution :", o: ["Basique", "Neutre", "Acide", "Saturée"], a: 2 },
+        { q: "Quelle est la formule de la dilution ?", o: ["C1 × V1 = C2 × V2", "C1 / V1 = C2 / V2", "C1 + V1 = C2 + V2", "C1 × V2 = C2 × V1"], a: 0 },
+        { q: "Quelle est la relation entre f et T ?", o: ["f = T", "f = 1/T", "f = T²", "f = 2πT"], a: 1 },
+        { q: "Quelle est l'unité de la fréquence ?", o: ["La seconde (s)", "Le Hertz (Hz)", "Le mètre (m)", "Le Joule (J)"], a: 1 },
+        { q: "Quelle est la formule reliant v, f et λ ?", o: ["v = f / λ", "v = f × λ", "v = λ / f", "v = f + λ"], a: 1 },
+        { q: "Quelle est la vitesse de la lumière dans le vide ?", o: ["3 × 10⁶ m/s", "3 × 10⁸ m/s", "3 × 10¹⁰ m/s", "3 × 10⁵ m/s"], a: 1 },
+        { q: "Qu'est-ce qu'une onde mécanique ?", o: ["Se propage dans le vide", "Nécessite un milieu matériel", "Une onde électromagnétique", "Une onde lumineuse"], a: 1 },
+        { q: "Le son est une onde :", o: ["Transversale", "Longitudinale", "Électromagnétique", "Stationnaire"], a: 1 },
+        { q: "Quelle est la plage de fréquences audibles ?", o: ["20 Hz à 200 Hz", "20 Hz à 20 000 Hz", "200 Hz à 200 000 Hz", "2 Hz à 2 000 Hz"], a: 1 },
+        { q: "Quelle est la deuxième loi de Newton ?", o: ["ΣF = 0", "ΣF = m × a", "F = -F'", "E = mc²"], a: 1 },
+        { q: "Quelle est l'unité de la force ?", o: ["Le Joule (J)", "Le Pascal (Pa)", "Le Newton (N)", "Le Watt (W)"], a: 2 },
+        { q: "Le poids d'un objet se calcule avec :", o: ["P = m/g", "P = m × g", "P = m × v", "P = m × a"], a: 1 },
+        { q: "Quelle est la valeur approchée de g sur Terre ?", o: ["9,81 m/s²", "6,67 m/s²", "3,14 m/s²", "10,5 m/s²"], a: 0 },
+        { q: "Qu'est-ce que la demi-vie d'un élément radioactif ?", o: ["Temps pour que la masse double", "Temps pour que la moitié des noyaux se désintègre", "Temps de réaction", "Moitié de la vie de l'atome"], a: 1 },
+        { q: "Quelle particule est émise lors d'une désintégration β⁻ ?", o: ["Un proton", "Un neutron", "Un électron", "Un photon"], a: 2 },
+        { q: "La relation d'Einstein est :", o: ["E = mc", "E = mc²", "E = m/c²", "E = m²c"], a: 1 },
+        { q: "Quelle est la source d'énergie d'un panneau photovoltaïque ?", o: ["Le vent", "Le rayonnement solaire", "La chaleur terrestre", "L'eau"], a: 1 },
+        { q: "L'effet de serre est dû principalement à quel gaz ?", o: ["L'oxygène O₂", "L'azote N₂", "Le dioxyde de carbone CO₂", "L'hydrogène H₂"], a: 2 },
+        { q: "Quelle est la loi de Snell-Descartes pour la réfraction ?", o: ["n₁ sin(i₁) = n₂ sin(i₂)", "n₁ cos(i₁) = n₂ cos(i₂)", "n₁ × i₁ = n₂ × i₂", "sin(i₁) / sin(i₂) = n₁ × n₂"], a: 0 },
+        { q: "L'indice de réfraction de l'air vaut environ :", o: ["0", "0,5", "1", "1,5"], a: 2 },
+        { q: "La lumière blanche est composée de :", o: ["Une seule longueur d'onde", "Plusieurs longueurs d'onde", "Uniquement rouge et bleu", "Aucune longueur d'onde"], a: 1 },
+        { q: "Quelle est la constante de temps τ d'un circuit RC ?", o: ["τ = R / C", "τ = R × C", "τ = R + C", "τ = C / R"], a: 1 },
+        { q: "Au bout de 5τ, un condensateur est chargé à environ :", o: ["50%", "63%", "95%", "99%"], a: 3 },
+        { q: "L'énergie stockée dans un condensateur est :", o: ["E = ½CU²", "E = CU", "E = C²U", "E = ½C²U"], a: 0 },
+        { q: "La capacité d'un condensateur se mesure en :", o: ["Ohm (Ω)", "Farad (F)", "Henry (H)", "Volt (V)"], a: 1 },
+        { q: "Le niveau sonore se mesure en :", o: ["Hertz (Hz)", "Décibels (dB)", "Watts (W)", "Pascal (Pa)"], a: 1 },
+        { q: "La vitesse du son dans l'air est d'environ :", o: ["34 m/s", "340 m/s", "3 400 m/s", "34 000 m/s"], a: 1 },
+        { q: "Le moment d'une force par rapport à un axe est :", o: ["M = F + d", "M = F × d", "M = F / d", "M = F² × d"], a: 1 },
+        { q: "Pour qu'un système soit en équilibre de rotation :", o: ["La somme des moments doit être maximale", "La somme des moments doit être nulle", "Il faut une seule force", "Les forces doivent être parallèles"], a: 1 },
+        { q: "Qu'est-ce qu'un oxydant ?", o: ["Perd des électrons", "Gagne des électrons", "Un gaz toxique", "Un acide fort"], a: 1 },
+        { q: "Qu'est-ce qu'un réducteur ?", o: ["Gagne des électrons", "Perd des électrons", "Un catalyseur", "Un solvant"], a: 1 },
+        { q: "La masse volumique ρ se calcule avec :", o: ["ρ = m × V", "ρ = V / m", "ρ = m / V", "ρ = m + V"], a: 2 },
+        { q: "Quelle est l'unité de la masse volumique en SI ?", o: ["kg/L", "g/cm³", "kg/m³", "g/L"], a: 2 },
+        { q: "La conservation de l'énergie mécanique signifie :", o: ["L'énergie augmente toujours", "Ec + Ep = constante (sans frottement)", "L'énergie disparaît", "Ec = Ep toujours"], a: 1 },
+        { q: "Quelle est la formule de l'énergie électrique consommée ?", o: ["E = P × t", "E = P / t", "E = P + t", "E = P² × t"], a: 0 },
+        { q: "Le courant continu (DC) est caractérisé par :", o: ["Change de sens périodiquement", "Circule toujours dans le même sens", "Est nul", "Augmente indéfiniment"], a: 1 },
+        { q: "Le courant alternatif (AC) est caractérisé par :", o: ["Est constant", "Circule dans un seul sens", "Change de sens périodiquement", "Diminue"], a: 2 },
+        { q: "La fréquence du courant du secteur en France est :", o: ["25 Hz", "50 Hz", "60 Hz", "100 Hz"], a: 1 },
+        { q: "Quelle est la tension efficace du secteur en France ?", o: ["110 V", "220 V", "230 V", "240 V"], a: 2 },
+        { q: "La relation entre Umax et Ueff pour un signal sinusoïdal est :", o: ["Umax = Ueff × √2", "Umax = Ueff / √2", "Umax = 2 × Ueff", "Umax = Ueff²"], a: 0 },
+        { q: "Un transformateur sert à :", o: ["Créer de l'énergie", "Modifier la tension d'un courant alternatif", "Stocker de l'énergie", "Convertir le DC en AC"], a: 1 },
+        { q: "Quelle est la formule du rapport de transformation ?", o: ["m = N1/N2 = U1/U2", "m = N2/N1 = U2/U1", "m = N1 × N2", "m = U1 + U2"], a: 1 },
+      ],
+      "maths": [
+        { q: "Quelle est la dérivée de f(x) = x² ?", o: ["f'(x) = x", "f'(x) = 2x", "f'(x) = x²", "f'(x) = 2"], a: 1 },
+        { q: "Quelle est la dérivée de f(x) = x³ ?", o: ["f'(x) = x²", "f'(x) = 3x", "f'(x) = 3x²", "f'(x) = x³"], a: 2 },
+        { q: "Quelle est la dérivée de f(x) = eˣ ?", o: ["f'(x) = xeˣ", "f'(x) = eˣ", "f'(x) = e", "f'(x) = 1/eˣ"], a: 1 },
+        { q: "Quelle est la dérivée de f(x) = ln(x) ?", o: ["f'(x) = x", "f'(x) = 1/x²", "f'(x) = 1/x", "f'(x) = ln(x)/x"], a: 2 },
+        { q: "Si f'(x) > 0 sur un intervalle, alors f est :", o: ["Décroissante", "Constante", "Croissante", "Nulle"], a: 2 },
+        { q: "La dérivée de f(x) = sin(x) est :", o: ["f'(x) = -sin(x)", "f'(x) = cos(x)", "f'(x) = -cos(x)", "f'(x) = tan(x)"], a: 1 },
+        { q: "La dérivée de f(x) = cos(x) est :", o: ["f'(x) = sin(x)", "f'(x) = -sin(x)", "f'(x) = cos(x)", "f'(x) = -cos(x)"], a: 1 },
+        { q: "La dérivée d'un produit u × v est :", o: ["u' × v'", "u' × v + u × v'", "u' + v'", "u × v' - u' × v"], a: 1 },
+        { q: "La dérivée d'un quotient u/v est :", o: ["u'/v'", "(u' × v - u × v') / v²", "(u × v' - u' × v) / v²", "u' / v - u / v'"], a: 1 },
+        { q: "La tangente à la courbe en a a pour équation :", o: ["y = f(a) + f'(a)", "y = f'(a)(x - a) + f(a)", "y = f(a)(x - a) + f'(a)", "y = f'(a) × x"], a: 1 },
+        { q: "Une suite arithmétique de raison r a pour terme général :", o: ["uₙ = u₀ × rⁿ", "uₙ = u₀ + n × r", "uₙ = u₀ × n + r", "uₙ = u₀ⁿ × r"], a: 1 },
+        { q: "Une suite géométrique de raison q a pour terme général :", o: ["uₙ = u₀ + n × q", "uₙ = u₀ × qⁿ", "uₙ = u₀ⁿ × q", "uₙ = u₀ / qⁿ"], a: 1 },
+        { q: "La somme des n premiers termes d'une suite arithmétique est :", o: ["S = n × u₀", "S = n × (u₁ + uₙ) / 2", "S = (n+1) × (premier + dernier) / 2", "S = nombre de termes × (premier + dernier) / 2"], a: 3 },
+        { q: "La somme des n premiers termes d'une suite géométrique (q ≠ 1) est :", o: ["S = u₀ × (1 - qⁿ) / (1 - q)", "S = u₀ × qⁿ", "S = n × u₀ × q", "S = u₀ / (1 - q)"], a: 0 },
+        { q: "Si |q| < 1, la suite géométrique uₙ = u₀ × qⁿ :", o: ["Diverge vers +∞", "Diverge vers -∞", "Converge vers 0", "Est constante"], a: 2 },
+        { q: "eᵃ × eᵇ = ?", o: ["eᵃ⁺ᵇ", "eᵃˣᵇ", "eᵃ + eᵇ", "eᵃ⁻ᵇ"], a: 0 },
+        { q: "ln(a × b) = ?", o: ["ln(a) × ln(b)", "ln(a) + ln(b)", "ln(a) - ln(b)", "ln(a) / ln(b)"], a: 1 },
+        { q: "ln(eˣ) = ?", o: ["eˣ", "x", "1", "0"], a: 1 },
+        { q: "e^(ln(x)) = ?", o: ["ln(x)", "1", "x", "e"], a: 2 },
+        { q: "ln(1) = ?", o: ["1", "0", "e", "-1"], a: 1 },
+        { q: "ln(a/b) = ?", o: ["ln(a) × ln(b)", "ln(a) / ln(b)", "ln(a) - ln(b)", "ln(a) + ln(b)"], a: 2 },
+        { q: "La fonction exponentielle est toujours :", o: ["Négative", "Nulle", "Positive", "Décroissante"], a: 2 },
+        { q: "La probabilité d'un événement certain est :", o: ["0", "0,5", "1", "∞"], a: 2 },
+        { q: "La probabilité d'un événement impossible est :", o: ["0", "0,5", "1", "-1"], a: 0 },
+        { q: "P(Ā) (probabilité du contraire de A) = ?", o: ["P(A)", "1 - P(A)", "1 + P(A)", "P(A)²"], a: 1 },
+        { q: "Pour deux événements indépendants A et B, P(A ∩ B) = ?", o: ["P(A) + P(B)", "P(A) × P(B)", "P(A) - P(B)", "P(A) / P(B)"], a: 1 },
+        { q: "L'espérance E(X) d'une variable aléatoire est :", o: ["La valeur maximale", "La somme des probabilités", "La moyenne pondérée des valeurs", "La variance"], a: 2 },
+        { q: "La loi binomiale B(n, p) modélise :", o: ["Un tirage unique", "n répétitions d'une épreuve de Bernoulli", "Une variable continue", "Un phénomène périodique"], a: 1 },
+        { q: "L'espérance d'une loi binomiale B(n, p) est :", o: ["n + p", "n × p", "n / p", "p / n"], a: 1 },
+        { q: "La variance d'une loi binomiale B(n, p) est :", o: ["n × p", "n × p × (1 - p)", "n × p²", "n² × p"], a: 1 },
+        { q: "cos²(x) + sin²(x) = ?", o: ["0", "1", "2", "x"], a: 1 },
+        { q: "cos(0) = ?", o: ["0", "1", "-1", "π"], a: 1 },
+        { q: "sin(π/2) = ?", o: ["0", "1", "-1", "½"], a: 1 },
+        { q: "cos(π) = ?", o: ["0", "1", "-1", "π"], a: 2 },
+        { q: "sin(π) = ?", o: ["0", "1", "-1", "π"], a: 0 },
+        { q: "Convertir 180° en radians :", o: ["π/2", "π", "2π", "π/4"], a: 1 },
+        { q: "Une primitive de f(x) = 2x est :", o: ["F(x) = x²", "F(x) = 2", "F(x) = x² + C", "F(x) = 2x²"], a: 2 },
+        { q: "∫₀¹ x dx = ?", o: ["0", "1", "½", "2"], a: 2 },
+        { q: "Une primitive de f(x) = 1/x (x > 0) est :", o: ["F(x) = x²/2", "F(x) = ln(x)", "F(x) = eˣ", "F(x) = -1/x²"], a: 1 },
+        { q: "L'intégrale d'une fonction positive représente :", o: ["La pente de la courbe", "L'aire sous la courbe", "La dérivée de la fonction", "Le maximum"], a: 1 },
+        { q: "Le nombre imaginaire i est défini par :", o: ["i = -1", "i² = -1", "i² = 1", "i = √1"], a: 1 },
+        { q: "Le module de z = 3 + 4i est :", o: ["7", "5", "1", "25"], a: 1 },
+        { q: "Le conjugué de z = a + bi est :", o: ["a - bi", "-a + bi", "-a - bi", "b + ai"], a: 0 },
+        { q: "Le produit scalaire de deux vecteurs orthogonaux est :", o: ["1", "-1", "0", "∞"], a: 2 },
+        { q: "La norme du vecteur (3, 4) est :", o: ["7", "12", "5", "1"], a: 2 },
+        { q: "Le produit scalaire u⃗·v⃗ = ?", o: ["x₁y₁ + x₂y₂", "x₁x₂ + y₁y₂", "x₁y₂ - x₂y₁", "x₁ + x₂ + y₁ + y₂"], a: 1 },
+        { q: "La médiane d'une série statistique est :", o: ["La valeur la plus fréquente", "La valeur qui partage en deux", "La somme des valeurs", "La moyenne"], a: 1 },
+        { q: "L'écart-type mesure :", o: ["La valeur centrale", "La dispersion autour de la moyenne", "La valeur maximale", "Le nombre de valeurs"], a: 1 },
+        { q: "Le mode d'une série statistique est :", o: ["La moyenne", "La médiane", "La valeur la plus fréquente", "L'écart-type"], a: 2 },
+        { q: "Le discriminant Δ est :", o: ["Δ = b² + 4ac", "Δ = b² - 4ac", "Δ = 4ac - b²", "Δ = a² - 4bc"], a: 1 },
+        { q: "Si Δ > 0, l'équation du second degré a :", o: ["Aucune solution réelle", "Une seule solution", "Deux solutions distinctes", "Une infinité"], a: 2 },
+        { q: "Si Δ = 0, l'équation du second degré a :", o: ["Aucune solution réelle", "Une solution double", "Deux solutions", "Trois solutions"], a: 1 },
+        { q: "Si Δ < 0, l'équation du second degré a :", o: ["Aucune solution réelle", "Une solution réelle", "Deux solutions réelles", "Des solutions positives"], a: 0 },
+        { q: "lim(x→+∞) eˣ = ?", o: ["0", "1", "+∞", "-∞"], a: 2 },
+        { q: "lim(x→+∞) e⁻ˣ = ?", o: ["0", "1", "+∞", "-∞"], a: 0 },
+        { q: "lim(x→0⁺) ln(x) = ?", o: ["0", "1", "+∞", "-∞"], a: 3 },
+        { q: "lim(x→+∞) ln(x) = ?", o: ["0", "1", "+∞", "-∞"], a: 2 },
+        { q: "Le TVI dit que :", o: ["Toute fonction a une dérivée", "Si f continue et f(a)×f(b)<0, f s'annule", "Toute fonction est croissante", "f(a) = f(b) toujours"], a: 1 },
+        { q: "La dérivée de f(x) = √x est :", o: ["f'(x) = 2√x", "f'(x) = 1/(2√x)", "f'(x) = √x/2", "f'(x) = x/2"], a: 1 },
+        { q: "La dérivée de f(x) = xⁿ est :", o: ["f'(x) = xⁿ⁻¹", "f'(x) = nxⁿ⁻¹", "f'(x) = nxⁿ", "f'(x) = (n-1)xⁿ"], a: 1 },
+        { q: "ln(aⁿ) = ?", o: ["n + ln(a)", "n × ln(a)", "aⁿ", "ln(n) × a"], a: 1 },
+        { q: "e⁰ = ?", o: ["0", "1", "e", "∞"], a: 1 },
+        { q: "La dérivée de f(x) = e^(2x) est :", o: ["f'(x) = e^(2x)", "f'(x) = 2e^(2x)", "f'(x) = 2xe^(2x)", "f'(x) = e^(2x)/2"], a: 1 },
+        { q: "Une primitive de f(x) = eˣ est :", o: ["F(x) = eˣ + C", "F(x) = xeˣ", "F(x) = eˣ/x", "F(x) = ln(eˣ)"], a: 0 },
+        { q: "La fonction f(x) = |x| est-elle dérivable en x = 0 ?", o: ["Oui, f'(0) = 0", "Oui, f'(0) = 1", "Non, pas dérivable en 0", "Non, pas continue en 0"], a: 2 },
+        { q: "La dérivée de f(x) = ax + b est :", o: ["f'(x) = a", "f'(x) = b", "f'(x) = ax", "f'(x) = a + b"], a: 0 },
+        { q: "Pour une suite uₙ₊₁ = uₙ + r, la suite est :", o: ["Géométrique", "Arithmétique", "Constante", "Divergente"], a: 1 },
+        { q: "Pour une suite uₙ₊₁ = q × uₙ, la suite est :", o: ["Arithmétique", "Géométrique", "Constante", "Alternée"], a: 1 },
+        { q: "sin(π/6) = ?", o: ["½", "√2/2", "√3/2", "1"], a: 0 },
+        { q: "cos(π/3) = ?", o: ["½", "√2/2", "√3/2", "1"], a: 0 },
+      ],
+      "sin": [
+        { q: "Comment convertir 123 (décimal) en binaire ?", o: ["1111011", "1110011", "1010111", "1001011"], a: 0 },
+        { q: "Quelle est la valeur décimale de 1010 1101 ?", o: ["163", "173", "183", "193"], a: 1 },
+        { q: "En hexadécimal, A correspond à :", o: ["8", "9", "10", "11"], a: 2 },
+        { q: "Combien de bits forment un chiffre hexadécimal ?", o: ["2 bits", "4 bits", "8 bits", "16 bits"], a: 1 },
+        { q: "255 en hexadécimal est :", o: ["FE", "FF", "F0", "EF"], a: 1 },
+        { q: "Quelle base utilise 0-9 puis A-F ?", o: ["Base 2", "Base 8", "Base 10", "Base 16"], a: 3 },
+        { q: "Un octet est composé de :", o: ["4 bits", "8 bits", "16 bits", "32 bits"], a: 1 },
+        { q: "1111 1111 en décimal = ?", o: ["127", "255", "256", "512"], a: 1 },
+        { q: "Comment convertir hex → binaire ?", o: ["Chaque chiffre = 2 bits", "Chaque chiffre = 4 bits", "Chaque chiffre = 8 bits", "On divise par 2"], a: 1 },
+        { q: "Le poids du LSB (bit le plus à droite) est :", o: ["2⁰ = 1", "2¹ = 2", "2⁷ = 128", "2⁸ = 256"], a: 0 },
+        { q: "La table ASCII code les caractères sur :", o: ["4 bits", "7 bits", "8 bits", "16 bits"], a: 1 },
+        { q: "En ASCII, le caractère 'A' a pour code décimal :", o: ["41", "55", "65", "97"], a: 2 },
+        { q: "Que signifie ASCII ?", o: ["American Standard Code for Information Interchange", "Advanced System Code for Internet", "Automated Standard Computing", "American System Code for Integration"], a: 0 },
+        { q: "La liaison RS232 est de type :", o: ["Synchrone", "Asynchrone", "Parallèle", "Optique"], a: 1 },
+        { q: "En RS232, la ligne au repos est à :", o: ["0 logique", "1 logique", "État indéfini", "Haute impédance"], a: 1 },
+        { q: "Le bit de Start en RS232 est à :", o: ["1", "0", "Alternance 0/1", "Haute impédance"], a: 1 },
+        { q: "En RS232, les bits de données sont envoyés :", o: ["MSB en premier", "LSB en premier", "Tous en même temps", "Ordre aléatoire"], a: 1 },
+        { q: "À quoi sert le bit de parité en RS232 ?", o: ["Accélérer", "Détecter les erreurs", "Chiffrer", "Synchroniser"], a: 1 },
+        { q: "À 9600 bauds, Tbit est environ :", o: ["1 µs", "10 µs", "104 µs", "1 ms"], a: 2 },
+        { q: "La vitesse RS232 s'exprime en :", o: ["Hertz", "Bauds", "Octets/s", "Mégabits/s"], a: 1 },
+        { q: "Le bus I²C utilise combien de fils ?", o: ["1 fil", "2 fils (SDA + SCL)", "4 fils", "8 fils"], a: 1 },
+        { q: "Sur I²C, SDA transporte :", o: ["L'horloge", "Les données", "L'alimentation", "La masse"], a: 1 },
+        { q: "Sur I²C, SCL transporte :", o: ["Les données", "L'alimentation", "L'horloge", "Le bit de parité"], a: 2 },
+        { q: "Le bus I²C est de type :", o: ["Asynchrone", "Synchrone", "Parallèle", "Optique"], a: 1 },
+        { q: "Sur I²C, l'adresse esclave est codée sur :", o: ["4 bits", "7 bits", "8 bits", "16 bits"], a: 1 },
+        { q: "Le bit R/W en I²C sert à :", o: ["Identifier le maître", "Indiquer lecture/écriture", "Vérifier erreurs", "Synchroniser"], a: 1 },
+        { q: "Que signifie ACK en I²C ?", o: ["Address Check Key", "Acknowledge", "Automatic Clock", "Asynchronous Channel"], a: 1 },
+        { q: "La formule du débit binaire D est :", o: ["D = N × T", "D = N_octets × 8 / T", "D = T / N", "D = N / 8"], a: 1 },
+        { q: "Si 50 octets en 0,1 s, le débit est :", o: ["400 bits/s", "4 000 bits/s", "500 bits/s", "5 000 bits/s"], a: 1 },
+        { q: "Le débit D peut aussi s'exprimer par :", o: ["D = Tbit", "D = 1 / Tbit", "D = Tbit²", "D = Tbit / 2"], a: 1 },
+        { q: "L'atténuation en espace libre A₀ (dB) est :", o: ["A₀ = 32,4 + 20·log(d) + 20·log(f)", "A₀ = 10·log(d) + 10·log(f)", "A₀ = d × f", "A₀ = 20·log(d/f)"], a: 0 },
+        { q: "Le rapport de puissance en dB est :", o: ["R = 20·log(Pₑ/Pᵣ)", "R = 10·log(Pₑ/Pᵣ)", "R = Pₑ / Pᵣ", "R = Pₑ - Pᵣ"], a: 1 },
+        { q: "Un bilan de puissance consiste à :", o: ["Multiplier les gains", "Additionner gains et pertes en dB", "Diviser les puissances", "Mesurer la température"], a: 1 },
+        { q: "Qu'est-ce qu'un réseau LAN ?", o: ["Un réseau mondial", "Un réseau local", "Un réseau sans fil uniquement", "Un réseau satellite"], a: 1 },
+        { q: "Qu'est-ce qu'un réseau WAN ?", o: ["Un réseau local", "Un réseau sans fil", "Un réseau étendu", "Un réseau privé"], a: 2 },
+        { q: "La topologie en étoile utilise :", o: ["Modem", "Commutateur (switch)", "Amplificateur", "Antenne"], a: 1 },
+        { q: "Avantage de la topologie en étoile :", o: ["Un câble tombe = tout coupé", "Un câble tombe = seul cet appareil coupé", "Pas de câble nécessaire", "Moins coûteuse"], a: 1 },
+        { q: "Combien de couches a le modèle OSI ?", o: ["4", "5", "6", "7"], a: 3 },
+        { q: "HTTP fonctionne à quelle couche OSI ?", o: ["Couche 1 (Physique)", "Couche 3 (Réseau)", "Couche 4 (Transport)", "Couche 7 (Application)"], a: 3 },
+        { q: "IP fonctionne à quelle couche ?", o: ["Application", "Transport", "Réseau (Internet)", "Physique"], a: 2 },
+        { q: "TCP assure :", o: ["Le routage", "Transmission fiable avec contrôle d'erreur", "L'adressage physique", "La modulation"], a: 1 },
+        { q: "L'encapsulation dans OSI c'est :", o: ["Supprimer les en-têtes", "Ajouter un en-tête à chaque couche", "Compresser", "Chiffrer"], a: 1 },
+        { q: "Une adresse MAC est composée de :", o: ["4 octets", "6 octets (12 chars hex)", "8 octets", "16 octets"], a: 1 },
+        { q: "L'adresse MAC est :", o: ["Attribuée par le routeur", "Modifiable", "Unique et gravée par le fabricant", "Identique pour tous"], a: 2 },
+        { q: "L'adresse IP est :", o: ["Physique et permanente", "Logique et peut changer", "Identique à MAC", "Toujours publique"], a: 1 },
+        { q: "Une adresse IP privée est :", o: ["Visible sur internet", "Utilisable dans le réseau local uniquement", "Attribuée par le FAI", "Toujours fixe"], a: 1 },
+        { q: "Quelle plage d'adresses est privée en classe C ?", o: ["10.0.0.0 à 10.255.255.255", "172.16.0.0 à 172.31.255.255", "192.168.0.0 à 192.168.255.255", "224.0.0.0 à 239.255.255.255"], a: 2 },
+        { q: "Qui attribue l'IP privée dans un réseau local ?", o: ["Le FAI", "Le serveur DNS", "Le routeur (DHCP)", "L'utilisateur uniquement"], a: 2 },
+        { q: "Le masque de sous-réseau sert à :", o: ["Chiffrer", "Séparer partie réseau / partie hôte", "Accélérer", "Attribuer les MAC"], a: 1 },
+        { q: "L'opération pour trouver l'adresse réseau est :", o: ["IP OU Masque", "IP ET Masque (AND)", "IP XOR Masque", "IP + Masque"], a: 1 },
+        { q: "IP = 192.168.2.5, masque = 255.255.255.0, adresse réseau = ?", o: ["192.168.2.5", "192.168.2.255", "192.168.2.0", "192.168.0.0"], a: 2 },
+        { q: "Le masque 255.255.255.0 en CIDR est :", o: ["/8", "/16", "/24", "/32"], a: 2 },
+        { q: "Avec un masque /24, combien d'hôtes ?", o: ["128", "254", "256", "512"], a: 1 },
+        { q: "Pourquoi retirer 2 adresses du total ?", o: ["Pour routeur et DNS", "Pour adresse réseau et broadcast", "Pour serveur et client", "Pour la sécurité"], a: 1 },
+        { q: "Avec un masque /26, combien d'hôtes ?", o: ["30", "62", "64", "126"], a: 1 },
+        { q: "Une adresse broadcast envoie un message à :", o: ["Un seul appareil", "Tous les appareils du réseau", "Le routeur uniquement", "Le serveur DNS"], a: 1 },
+        { q: "La monodiffusion (unicast) envoie à :", o: ["Tous les appareils", "Un groupe", "Un seul appareil précis", "Aucun appareil"], a: 2 },
+        { q: "Le switch utilise quelle adresse ?", o: ["Adresse IP", "Adresse MAC", "Adresse DNS", "Adresse URL"], a: 1 },
+        { q: "Le routeur utilise quelle adresse ?", o: ["Adresse MAC", "Adresse physique", "Adresse IP", "Adresse ASCII"], a: 2 },
+        { q: "Différence switch / routeur :", o: ["Switch sans fil, routeur filaire", "Switch relie même réseau (MAC), routeur relie réseaux différents (IP)", "Aucune différence", "Routeur plus lent"], a: 1 },
+        { q: "Une trame est composée de :", o: ["Uniquement données", "En-tête + données + contrôle", "Uniquement en-tête", "Un mot de passe"], a: 1 },
+        { q: "Ethernet utilise les adresses :", o: ["IP", "MAC", "DNS", "URL"], a: 1 },
+        { q: "Quelle couche OSI gère l'adressage MAC ?", o: ["Couche 1 (Physique)", "Couche 2 (Liaison)", "Couche 3 (Réseau)", "Couche 4 (Transport)"], a: 1 },
+        { q: "0xA9 en décimal = ?", o: ["149", "159", "169", "179"], a: 2 },
+        { q: "1 AND 0 = ?", o: ["1", "0", "2", "Indéfini"], a: 1 },
+        { q: "1 AND 1 = ?", o: ["0", "1", "2", "10"], a: 1 },
+        { q: "En RS232, combien de bits de Stop minimum ?", o: ["0", "1", "2", "3"], a: 1 },
+        { q: "Le protocole DNS sert à :", o: ["Chiffrer", "Convertir nom de domaine en IP", "Attribuer les MAC", "Compresser"], a: 1 },
+        { q: "La notation CIDR /16 correspond au masque :", o: ["255.0.0.0", "255.255.0.0", "255.255.255.0", "255.255.255.128"], a: 1 },
+        { q: "La condition START en I²C est :", o: ["SCL bas→haut pendant SDA haut", "SDA haut→bas pendant SCL haut", "SDA et SCL bas simultanément", "SCL haut→bas pendant SDA bas"], a: 1 },
+      ]
+    };
+
+    const subjectInfo = {
+      "physique-chimie": { name: "Physique-Chimie", emoji: "⚛️", color: "#3b82f6" },
+      "maths": { name: "Mathématiques", emoji: "📐", color: "#a855f7" },
+      "sin": { name: "SIN", emoji: "💻", color: "#22c55e" }
+    };
+
+    // ============== STATE ==============
+    let currentSubject = null;
+    let playerName = "";
+    let questions = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let answeredCount = 0;
+
+    // ============== FUNCTIONS ==============
+    function shuffleArray(array) {
+      const shuffled = [...array];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    }
+
+    function selectSubject(subject) {
+      currentSubject = subject;
+      const info = subjectInfo[subject];
+      
+      document.getElementById('subject-icon').textContent = info.emoji;
+      document.getElementById('subject-title').textContent = info.name;
+      
+      document.getElementById('home-screen').classList.add('hidden');
+      document.getElementById('quiz-container').classList.add('active');
+      document.getElementById('name-screen').style.display = 'block';
+      document.getElementById('quiz-screen').classList.remove('active');
+      document.getElementById('results-screen').classList.remove('active');
+      
+      document.getElementById('player-name').focus();
+    }
+
+    function startQuiz() {
+      playerName = document.getElementById('player-name').value.trim();
+      if (!playerName) {
+        alert('Entre ton prénom !');
+        return;
+      }
+
+      // Select 20 random questions
+      const allQuestions = questionsDB[currentSubject];
+      questions = shuffleArray(allQuestions).slice(0, 20);
+      
+      currentQuestionIndex = 0;
+      score = 0;
+      answeredCount = 0;
+
+      // Update UI
+      document.getElementById('player-display').textContent = playerName;
+      document.getElementById('current-emoji').textContent = subjectInfo[currentSubject].emoji;
+      
+      document.getElementById('name-screen').style.display = 'none';
+      document.getElementById('quiz-screen').classList.add('active');
+      
+      displayQuestion();
+    }
+
+    function displayQuestion() {
+      const q = questions[currentQuestionIndex];
+      
+      document.getElementById('question-number').textContent = currentQuestionIndex + 1;
+      document.getElementById('question-num').textContent = currentQuestionIndex + 1;
+      document.getElementById('question-text').textContent = q.q;
+      document.getElementById('current-score').textContent = score;
+      document.getElementById('answered-count').textContent = answeredCount;
+      
+      const progress = ((currentQuestionIndex + 1) / 20) * 100;
+      document.getElementById('progress-fill').style.width = progress + '%';
+      
+      const optionsContainer = document.getElementById('options-container');
+      optionsContainer.innerHTML = '';
+      
+      const letters = ['A', 'B', 'C', 'D'];
+      q.o.forEach((option, idx) => {
+        const optionEl = document.createElement('div');
+        optionEl.className = 'option';
+        optionEl.innerHTML = `
+          <span class="option-letter">${letters[idx]}</span>
+          <span class="option-text">${option}</span>
+        `;
+        optionEl.onclick = () => selectAnswer(idx);
+        optionsContainer.appendChild(optionEl);
+      });
+    }
+
+    function selectAnswer(selectedIdx) {
+      const q = questions[currentQuestionIndex];
+      const options = document.querySelectorAll('.option');
+      
+      // Disable all options
+      options.forEach(opt => {
+        opt.classList.add('disabled');
+        opt.onclick = null;
+      });
+      
+      answeredCount++;
+      
+      // Show correct/wrong
+      if (selectedIdx === q.a) {
+        score++;
+        options[selectedIdx].classList.add('correct');
+        options[selectedIdx].innerHTML += '<span class="option-icon">✓</span>';
+      } else {
+        options[selectedIdx].classList.add('wrong');
+        options[selectedIdx].innerHTML += '<span class="option-icon">✗</span>';
+        options[q.a].classList.add('correct');
+        options[q.a].innerHTML += '<span class="option-icon">✓</span>';
+      }
+      
+      document.getElementById('current-score').textContent = score;
+      document.getElementById('answered-count').textContent = answeredCount;
+      
+      // Next question or results
+      setTimeout(() => {
+        if (currentQuestionIndex < 19) {
+          currentQuestionIndex++;
+          displayQuestion();
+        } else {
+          showResults();
+        }
+      }, 1200);
+    }
+
+    function showResults() {
+      document.getElementById('quiz-screen').classList.remove('active');
+      document.getElementById('results-screen').classList.add('active');
+      
+      document.getElementById('results-player').textContent = playerName;
+      document.getElementById('results-subject').textContent = subjectInfo[currentSubject].name;
+      document.getElementById('final-score').textContent = score;
+      
+      // Score circle animation
+      const percentage = (score / 20) * 100;
+      const circumference = 2 * Math.PI * 50;
+      const dashArray = (percentage / 100) * circumference;
+      document.getElementById('score-circle-fill').setAttribute('stroke-dasharray', `${dashArray} ${circumference}`);
+      
+      // Message
+      let emoji, message, messageClass;
+      if (percentage >= 90) {
+        emoji = "🏆"; message = "Excellent ! Tu es au top !"; messageClass = "excellent";
+      } else if (percentage >= 75) {
+        emoji = "🎉"; message = "Très bien ! Continue comme ça !"; messageClass = "good";
+      } else if (percentage >= 50) {
+        emoji = "👍"; message = "Pas mal ! Encore un effort !"; messageClass = "ok";
+      } else if (percentage >= 30) {
+        emoji = "📚"; message = "Il faut réviser un peu plus !"; messageClass = "bad";
+      } else {
+        emoji = "😢"; message = "Courage, tu peux faire mieux !"; messageClass = "fail";
+      }
+      
+      document.getElementById('results-emoji').textContent = emoji;
+      const msgEl = document.getElementById('results-message');
+      msgEl.textContent = message;
+      msgEl.className = 'results-message ' + messageClass;
+      
+      // Send to Discord
+      sendToDiscord();
+    }
+
+    async function sendToDiscord() {
+      const webhookUrl = "https://discord.com/api/webhooks/1514561760722685962/cQKq420SkYV9C4K3pnynFxebD6NV5Nm7CegCtrF0tYAGm49Z92YXiQZiTI1haFr7Rgag";
+      
+      const percentage = Math.round((score / 20) * 100);
+      let color, emoji;
+      if (percentage >= 90) { color = 0xFFD700; emoji = "🏆"; }
+      else if (percentage >= 75) { color = 0x22C55E; emoji = "🎉"; }
+      else if (percentage >= 50) { color = 0x3B82F6; emoji = "👍"; }
+      else if (percentage >= 30) { color = 0xFB923C; emoji = "📚"; }
+      else { color = 0xEF4444; emoji = "😢"; }
+
+      const info = subjectInfo[currentSubject];
+      
+      const embed = {
+        title: `${emoji} Nouveau Score !`,
+        color: color,
+        fields: [
+          { name: "👤 Joueur", value: playerName, inline: true },
+          { name: `${info.emoji} Matière`, value: info.name, inline: true },
+          { name: "📊 Score", value: `**${score}/20** (${percentage}%)`, inline: true },
+        ],
+        footer: { text: "Quiz Bac STI2D" },
+        timestamp: new Date().toISOString()
+      };
+
+      try {
+        await fetch(webhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ embeds: [embed] })
+        });
+      } catch (err) {
+        console.error("Erreur webhook:", err);
+      }
+    }
+
+    function restartQuiz() {
+      document.getElementById('results-screen').classList.remove('active');
+      document.getElementById('name-screen').style.display = 'block';
+      document.getElementById('player-name').value = playerName;
+    }
+
+    function goHome() {
+      document.getElementById('quiz-container').classList.remove('active');
+      document.getElementById('home-screen').classList.remove('hidden');
+      document.getElementById('name-screen').style.display = 'block';
+      document.getElementById('quiz-screen').classList.remove('active');
+      document.getElementById('results-screen').classList.remove('active');
+      document.getElementById('player-name').value = '';
+      currentSubject = null;
+    }
+
+    // Enter key to start quiz
+    document.getElementById('player-name').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') startQuiz();
+    });
+  </script>
+</body>
+</html>
